@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  auth-service:
+    build: ./backend/auth-service
+    container_name: auth_service
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${PORT_AUTH}:8085"
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+
+  solicitacao-service:
+    build: ./backend/solicitacao-service
+    container_name: solicitacao_service
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${PORT_SOLICITACAO}:8082"
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+
+volumes:
+  postgres_data:
