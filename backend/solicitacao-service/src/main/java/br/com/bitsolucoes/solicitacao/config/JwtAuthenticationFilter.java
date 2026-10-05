@@ -52,14 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String role = claims.get("role", String.class);
                 Long userId = claims.get("id", Long.class);
 
-                if (email != null) {
+                if (email != null && role != null) {
+                    String formattedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
                                     nome,
                                     userId,
                                     Collections.singletonList(
-                                            new SimpleGrantedAuthority(role)
+                                            new SimpleGrantedAuthority(formattedRole)
                                     )
                             );
 

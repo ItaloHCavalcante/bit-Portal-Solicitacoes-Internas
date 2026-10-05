@@ -12,5 +12,7 @@ public record SolicitacaoResponseDTO(
         Categoria categoria,
         StatusSolicitacao status,
         String solicitanteNome,
-        LocalDateTime dataCriacao
+        LocalDateTime dataCriacao,
+        //Operador
+        String respostaOperador
 ) {}
