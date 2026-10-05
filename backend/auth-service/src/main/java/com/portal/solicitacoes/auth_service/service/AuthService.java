@@ -3,6 +3,8 @@ package br.com.bitsolucoes.auth.service;
 import br.com.bitsolucoes.auth.dto.AuthResponseDTO;
 import br.com.bitsolucoes.auth.dto.LoginRequestDTO;
 import br.com.bitsolucoes.auth.dto.RegisterRequestDTO;
+import br.com.bitsolucoes.auth.exception.EmailAlreadyExistsException;
+import br.com.bitsolucoes.auth.exception.InvalidCredentialsException;
 import br.com.bitsolucoes.auth.model.Usuario;
 import br.com.bitsolucoes.auth.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class AuthService {
 
     public AuthResponseDTO registrar(RegisterRequestDTO dto) {
         if (usuarioRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("E-mail já cadastrado!");
+            throw new EmailAlreadyExistsException("Este e-mail já está cadastrado.");
         }
 
         Usuario usuario = Usuario.builder()
@@ -43,10 +45,10 @@ public class AuthService {
 
     public AuthResponseDTO login(LoginRequestDTO dto) {
         Usuario usuario = usuarioRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new IllegalArgumentException("Credenciais inválidas"));
+                .orElseThrow(() -> new InvalidCredentialsException("E-mail ou senha incorretos."));
 
         if (!passwordEncoder.matches(dto.senha(), usuario.getSenha())) {
-            throw new IllegalArgumentException("Credenciais inválidas");
+            throw new InvalidCredentialsException("E-mail ou senha incorretos.");
         }
 
         String token = jwtService.gerarToken(usuario);

@@ -25,14 +25,13 @@ public class SolicitacaoService {
 
     private final SolicitacaoRepository repository;
 
+    //Criar Solicitação
     @Transactional
     public SolicitacaoResponseDTO criar(SolicitacaoRequestDTO dto, Authentication auth) {
         Solicitacao solicitacao = new Solicitacao();
-
         solicitacao.setTitulo(dto.titulo());
         solicitacao.setDescricao(dto.descricao());
         solicitacao.setCategoria(dto.categoria());
-
         solicitacao.setStatus(StatusSolicitacao.ABERTO);
         solicitacao.setDataCriacao(LocalDateTime.now());
 
@@ -44,62 +43,63 @@ public class SolicitacaoService {
         return toDTO(salva);
     }
 
+    // Listar todas as Solicitações
     @Transactional(readOnly = true)
-    public List<SolicitacaoResponseDTO> listarTodas() {
-        return repository.findAll().stream().map(this::toDTO).toList();
+    public List<SolicitacaoResponseDTO> listarTodas(Authentication auth) {
+        if (isOperador(auth)) {
+            return repository.findAll().stream().map(this::toDTO).toList();
+        }
+        return repository.findAllBySolicitanteNome(auth.getName()).stream().map(this::toDTO).toList();
     }
 
+    // Buscar Solicitação por ID
     @Transactional(readOnly = true)
-    public SolicitacaoResponseDTO buscarPorId(Long id) {
-        return repository.findById(id)
-                .map(this::toDTO)
+    public SolicitacaoResponseDTO buscarPorId(Long id, Authentication auth) {
+        Solicitacao solicitacao = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
+
+        //Se não for operador, e o dono for diferente de quem está pedindo = Acesso Negado
+        if (!isOperador(auth) && !solicitacao.getSolicitanteNome().equals(auth.getName())) {
+            throw new SecurityException("Acesso negado. Você não pode visualizar esta solicitação.");
+        }
+        return toDTO(solicitacao);
     }
 
-    // AJUSTE: Implementado para filtrar as solicitações do usuário logado
+    //Listar Minhas Solicitações
     @Transactional(readOnly = true)
     public List<SolicitacaoResponseDTO> listarMinhas(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return List.of();
-        }
-        String nomeUsuario = auth.getName();
-        return repository.findAllBySolicitanteNome(nomeUsuario)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+        if (auth == null || !auth.isAuthenticated()) return List.of();
+        return repository.findAllBySolicitanteNome(auth.getName())
+                .stream().map(this::toDTO).toList();
     }
 
+    //Busca Genérica
     @Transactional(readOnly = true)
-    public List<SolicitacaoResponseDTO> listarEmAndamentoOperador() {
-        return repository.findAll().stream().map(this::toDTO).toList();
-    }
+    public List<SolicitacaoResponseDTO> buscarGenerica(String query, Authentication auth) {
+        String dono = isOperador(auth) ? null : auth.getName();
 
-    @Transactional(readOnly = true)
-    public List<SolicitacaoResponseDTO> buscarGenerica(String query) {
         if (query == null || query.isBlank()) {
-            return listarEmAndamentoOperador();
+            return dono == null
+                    ? repository.findAll().stream().map(this::toDTO).toList()
+                    : repository.findAllBySolicitanteNome(dono).stream().map(this::toDTO).toList();
         }
 
         String termoTratado = query.trim();
         Long idBusca = null;
 
         if (termoTratado.matches("\\d+")) {
-            try {
-                idBusca = Long.parseLong(termoTratado);
-            } catch (NumberFormatException ignored) {}
+            try { idBusca = Long.parseLong(termoTratado); } catch (NumberFormatException ignored) {}
         }
 
-        return repository.buscarPorIdOuTermo(idBusca, termoTratado)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+        return repository.buscarPorIdOuTermo(idBusca, termoTratado, dono)
+                .stream().map(this::toDTO).toList();
     }
 
-    //Editar solicitação (Apenas status ABERTO e mesmo solicitante)
+    // Editar Solicitação
     @Transactional
     public SolicitacaoResponseDTO editar(Long id, SolicitacaoRequestDTO dto, Authentication auth) {
         Solicitacao solicitacao = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada com ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
 
         validarProprietarioEStatusAberto(solicitacao, auth, "editar");
 
@@ -107,66 +107,78 @@ public class SolicitacaoService {
         solicitacao.setDescricao(dto.descricao());
         solicitacao.setCategoria(dto.categoria());
 
-        Solicitacao atualizada = repository.save(solicitacao);
-        return toDTO(atualizada);
+        return toDTO(repository.save(solicitacao));
     }
 
-    //Excluir solicitação (Apenas status ABERTO e mesmo solicitante)
+    // Excluir Solicitação
     @Transactional
     public void excluir(Long id, Authentication auth) {
         Solicitacao solicitacao = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada com ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
 
         validarProprietarioEStatusAberto(solicitacao, auth, "excluir");
-
         repository.delete(solicitacao);
     }
 
-    //Alterar status da solicitação
+    // Alterar Status
     @Transactional
-    public SolicitacaoResponseDTO alterarStatus(Long id, StatusSolicitacao novoStatus) {
+    public SolicitacaoResponseDTO alterarStatus(Long id, StatusSolicitacao novoStatus, String resposta) { // <- Adicionar String resposta
         Solicitacao solicitacao = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada com ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
 
         solicitacao.setStatus(novoStatus);
-        Solicitacao atualizada = repository.save(solicitacao);
-        return toDTO(atualizada);
+
+        if (resposta != null && !resposta.trim().isEmpty()) {
+            solicitacao.setRespostaOperador(resposta);
+        }
+
+        return toDTO(repository.save(solicitacao));
     }
 
-    //Filtro com Paginador (Datas, Categoria, Status, Título)
     @Transactional(readOnly = true)
     public Page<SolicitacaoResponseDTO> listarComFiltros(
-            LocalDateTime dataInicio,
-            LocalDateTime dataFim,
-            Categoria categoria,
-            StatusSolicitacao status,
-            String texto,
-            Pageable pageable) {
+            LocalDateTime dataInicio, LocalDateTime dataFim, Categoria categoria,
+            StatusSolicitacao status, String texto, Pageable pageable, Authentication auth) {
 
-        Specification<Solicitacao> spec = SolicitacaoSpecification.comFiltros(dataInicio, dataFim, categoria, status, texto);
+        String dono = isOperador(auth) ? null : auth.getName();
+        Specification<Solicitacao> spec = SolicitacaoSpecification.comFiltros(dataInicio, dataFim, categoria, status, texto, dono);
+
         return repository.findAll(spec, pageable).map(this::toDTO);
     }
 
-    //Métricas pra o dashboard
+    // Métricas
     @Transactional(readOnly = true)
-    public MetricasDTO obterMetricas() {
-        long total = repository.count();
-        long abertas = repository.countByStatus(StatusSolicitacao.ABERTO);
-        long emAtendimento = repository.countByStatus(StatusSolicitacao.EM_ATENDIMENTO);
-        long concluidas = repository.countByStatus(StatusSolicitacao.CONCLUIDO);
-
-        return new MetricasDTO(total, abertas, emAtendimento, concluidas);
+    public MetricasDTO obterMetricas(Authentication auth) {
+        if (isOperador(auth)) {
+            return new MetricasDTO(
+                    repository.count(),
+                    repository.countByStatus(StatusSolicitacao.ABERTO),
+                    repository.countByStatus(StatusSolicitacao.EM_ATENDIMENTO),
+                    repository.countByStatus(StatusSolicitacao.CONCLUIDO)
+            );
+        } else {
+            String nome = auth.getName();
+            return new MetricasDTO(
+                    repository.countBySolicitanteNome(nome),
+                    repository.countBySolicitanteNomeAndStatus(nome, StatusSolicitacao.ABERTO),
+                    repository.countBySolicitanteNomeAndStatus(nome, StatusSolicitacao.EM_ATENDIMENTO),
+                    repository.countBySolicitanteNomeAndStatus(nome, StatusSolicitacao.CONCLUIDO)
+            );
+        }
     }
 
-    //Método auxiliar (Validação das Regras de Negócio)
+    private boolean isOperador(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) return false;
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_OPERADOR"));
+    }
+
     private void validarProprietarioEStatusAberto(Solicitacao solicitacao, Authentication auth, String acao) {
         if (solicitacao.getStatus() != StatusSolicitacao.ABERTO) {
             throw new IllegalStateException("Apenas solicitações com status 'ABERTO' podem ser " + acao + "s.");
         }
-
         if (auth != null && auth.isAuthenticated()) {
-            String usuarioLogado = auth.getName();
-            if (!usuarioLogado.equals(solicitacao.getSolicitanteNome())) {
+            if (!auth.getName().equals(solicitacao.getSolicitanteNome())) {
                 throw new SecurityException("Apenas o criador da solicitação tem permissão para " + acao + ".");
             }
         }
@@ -180,7 +192,8 @@ public class SolicitacaoService {
                 s.getCategoria(),
                 s.getStatus(),
                 s.getSolicitanteNome(),
-                s.getDataCriacao()
+                s.getDataCriacao(),
+                s.getRespostaOperador()
         );
     }
 }

@@ -38,13 +38,13 @@ public class SolicitacaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SolicitacaoResponseDTO>> listarTodas() {
-        return ResponseEntity.ok(service.listarTodas());
+    public ResponseEntity<List<SolicitacaoResponseDTO>> listarTodas(Authentication authentication) {
+        return ResponseEntity.ok(service.listarTodas(authentication));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SolicitacaoResponseDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(service.buscarPorId(id));
+    public ResponseEntity<SolicitacaoResponseDTO> buscarPorId(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(service.buscarPorId(id, authentication));
     }
 
     @GetMapping("/minhas")
@@ -55,11 +55,11 @@ public class SolicitacaoController {
     @GetMapping("/operador/buscar")
     @PreAuthorize("hasRole('OPERADOR')")
     public ResponseEntity<List<SolicitacaoResponseDTO>> buscar(
-            @RequestParam(required = false) String q) {
-        return ResponseEntity.ok(service.buscarGenerica(q));
+            @RequestParam(required = false) String q,
+            Authentication authentication) {
+        return ResponseEntity.ok(service.buscarGenerica(q, authentication));
     }
 
-    //Permite o solicitante editar a SOLICITAÇÃO apenas se estiver em ABERTO
     @PutMapping("/{id}")
     public ResponseEntity<SolicitacaoResponseDTO> editar(
             @PathVariable Long id,
@@ -68,7 +68,6 @@ public class SolicitacaoController {
         return ResponseEntity.ok(service.editar(id, dto, authentication));
     }
 
-    //O Solicitante pode fazer a EXCLUSÃO apenas se o Status tiver em "ABERTO"
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(
             @PathVariable Long id,
@@ -77,32 +76,17 @@ public class SolicitacaoController {
         return ResponseEntity.noContent().build();
     }
 
-    //Apenas o Operador pode mudar o STATUS da SOLICITAÇÃO
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('OPERADOR')")
     public ResponseEntity<SolicitacaoResponseDTO> alterarStatus(
             @PathVariable Long id,
-            @RequestParam StatusSolicitacao novoStatus) {
-        return ResponseEntity.ok(service.alterarStatus(id, novoStatus));
-    }
-
-    //Método para FILTRAR solicitações por: DATA (inicio e fim), CATEGORIA, STATUS ou TÍTULO
-    @GetMapping("/filtrar")
-    public ResponseEntity<Page<SolicitacaoResponseDTO>> filtrar(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim,
-            @RequestParam(required = false) Categoria categoria,
-            @RequestParam(required = false) StatusSolicitacao status,
-            @RequestParam(required = false) String texto,
-            @PageableDefault(size = 10, sort = "dataCriacao", direction = Sort.Direction.DESC) Pageable pageable) {
-
-        Page<SolicitacaoResponseDTO> resultado = service.listarComFiltros(
-                dataInicio, dataFim, categoria, status, texto, pageable);
-        return ResponseEntity.ok(resultado);
+            @RequestParam StatusSolicitacao novoStatus,
+            @RequestParam(required = false) String resposta) {
+        return ResponseEntity.ok(service.alterarStatus(id, novoStatus, resposta));
     }
 
     @GetMapping("/metricas")
-    public ResponseEntity<MetricasDTO> obterMetricas() {
-        return ResponseEntity.ok(service.obterMetricas());
+    public ResponseEntity<MetricasDTO> obterMetricas(Authentication authentication) {
+        return ResponseEntity.ok(service.obterMetricas(authentication));
     }
 }
