@@ -32,6 +32,9 @@ public class Solicitacao {
 
     private LocalDateTime dataCriacao;
 
+    @Column(columnDefinition = "TEXT")
+    private String respostaOperador;
+
     @PrePersist
     public void prePersist() {
         this.dataCriacao = LocalDateTime.now();

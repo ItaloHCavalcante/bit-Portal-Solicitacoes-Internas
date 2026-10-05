@@ -17,10 +17,15 @@ public class SolicitacaoSpecification {
             LocalDateTime dataFim,
             Categoria categoria,
             StatusSolicitacao status,
-            String texto) {
+            String texto,
+            String dono) {
 
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            if (dono != null) {
+                predicates.add(criteriaBuilder.equal(root.get("solicitanteNome"), dono));
+            }
 
             if (dataInicio != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dataCriacao"), dataInicio));
