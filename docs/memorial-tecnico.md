@@ -11,7 +11,7 @@
 
 # 1. Introdução
 
-Este documento apresenta o Memorial Técnico de Desenvolvimento do **Portal de Solicitações Internas**, desenvolvido como parte da etapa técnica do processo seletivo para Desenvolvedor(a) de Sistemas Júnior da bit Soluções.
+Este documento apresenta o Memorial Técnico de Desenvolvimento do **Portal de Solicitações Internas**
 
 O objetivo do projeto é disponibilizar uma aplicação web capaz de permitir que colaboradores registrem solicitações internas, acompanhem sua evolução e consultem informações relacionadas às demandas cadastradas.
 
@@ -21,29 +21,9 @@ A arquitetura adotada utiliza serviços independentes para autenticação e gere
 
 ---
 
-# 2. Objetivos do Projeto
+# 2. Tecnologias Utilizadas
 
-O principal objetivo foi desenvolver uma solução funcional para gerenciamento de solicitações internas, contemplando os requisitos apresentados no desafio técnico.
-
-Entre os objetivos específicos estão:
-
-* Implementar autenticação de usuários;
-* Permitir o cadastro de solicitações;
-* Permitir consulta e gerenciamento das solicitações;
-* Implementar controle de acesso de acordo com o perfil do usuário;
-* Permitir alteração do status das solicitações;
-* Disponibilizar filtros e mecanismos de busca;
-* Apresentar métricas através de um dashboard;
-* Persistir os dados em banco de dados relacional;
-* Disponibilizar uma API para comunicação entre frontend e backend;
-* Organizar a aplicação de forma modular;
-* Facilitar a execução do projeto através de Docker e Docker Compose.
-
-## Os requisitos funcionais do desafio contemplam autenticação, cadastro e gerenciamento de solicitações, filtros e dashboard com indicadores de status.
-
-# 3. Tecnologias Utilizadas
-
-## 3.1 Frontend
+## 2.1 Frontend
 
 ### React
 
@@ -73,9 +53,9 @@ Sua utilização proporciona um ambiente de desenvolvimento rápido e simplifica
 
 ---
 
-# 4. Backend
+# 3. Backend
 
-## 4.1 Java 21
+## 3.1 Java 21
 
 O Java foi utilizado como linguagem principal do backend.
 
@@ -85,7 +65,7 @@ Além disso, Java possui amplo ecossistema para desenvolvimento de APIs, aplica�
 
 ---
 
-## 4.2 Spring Boot
+## 3.2 Spring Boot
 
 O Spring Boot foi utilizado como base dos serviços backend.
 
@@ -100,7 +80,7 @@ A utilização do framework também facilita a configuração das dependências 
 
 ---
 
-## 4.3 Spring Security
+## 3.3 Spring Security
 
 O Spring Security foi utilizado para implementar a camada de segurança da aplicação.
 
@@ -110,7 +90,7 @@ A escolha do Spring Security está relacionada à integração natural com o Spr
 
 ---
 
-## 4.4 JWT
+## 3.4 JWT
 
 JSON Web Token (JWT) foi utilizado como mecanismo de autenticação da API.
 
@@ -120,7 +100,7 @@ A utilização de JWT foi escolhida por se adequar ao modelo de comunicação ba
 
 ---
 
-## 4.5 Spring Data JPA
+## 3.5 Spring Data JPA
 
 O Spring Data JPA foi utilizado para realizar a persistência das entidades da aplicação.
 
@@ -130,7 +110,7 @@ A tecnologia também facilita a criação de repositórios e a integração com 
 
 ---
 
-## 4.6 Hibernate
+## 3.6 Hibernate
 
 O Hibernate atua como implementação do JPA utilizada pelo projeto para realizar o mapeamento objeto-relacional.
 
@@ -140,9 +120,9 @@ Isso reduz a necessidade de escrever manualmente SQL para operações comuns e m
 
 ---
 
-# 5. Banco de Dados
+# 4. Banco de Dados
 
-## 5.1 PostgreSQL
+## 4.1 PostgreSQL
 
 O PostgreSQL foi escolhido como banco de dados relacional da aplicação.
 
@@ -161,7 +141,7 @@ O PostgreSQL é executado através de um container Docker, facilitando a configu
 
 ---
 
-## 5.2 Inicialização do banco
+## 4.2 Inicialização do banco
 
 A estrutura necessária para execução do banco é disponibilizada através do arquivo:
 
@@ -175,9 +155,9 @@ A estratégia permite que a estrutura necessária para execução do sistema sej
 
 ---
 
-# 6. Containerização
+# 5. Containerização
 
-## 6.1 Docker
+## 5.1 Docker
 
 Docker foi utilizado para padronizar o ambiente de execução dos serviços backend e do banco de dados.
 
@@ -187,7 +167,7 @@ No projeto, os serviços são executados de forma isolada em containers.
 
 ---
 
-## 6.2 Docker Compose
+## 5.2 Docker Compose
 
 Docker Compose foi utilizado para orquestrar os containers da aplicação.
 
@@ -209,7 +189,7 @@ O Docker e Docker Compose também foram utilizados como diferencial de infraestr
 
 ---
 
-# 7. Arquitetura da Aplicação
+# 6. Arquitetura da Aplicação
 
 A aplicação foi estruturada seguindo uma abordagem baseada em microsserviços.
 
@@ -244,9 +224,9 @@ A separação dos serviços foi adotada para manter as responsabilidades de aute
 
 ---
 
-# 8. Organização dos Serviços
+# 7. Organização dos Serviços
 
-## 8.1 auth-service
+## 7.1 auth-service
 
 O `auth-service` concentra as responsabilidades relacionadas à autenticação.
 
@@ -263,7 +243,7 @@ A separação desse serviço permite que a responsabilidade de autenticação fi
 
 ---
 
-## 8.2 solicitacao-service
+## 7.2 solicitacao-service
 
 O `solicitacao-service` concentra as regras relacionadas às solicitações internas.
 
@@ -282,7 +262,7 @@ Essa separação permite que a lógica do domínio principal da aplicação fiqu
 
 ---
 
-# 9. Organização das Camadas
+# 8. Organização das Camadas
 
 Dentro dos serviços backend, foi utilizada uma organização baseada na separação de responsabilidades.
 
@@ -318,7 +298,7 @@ Essa separação facilita a manutenção e reduz o acoplamento entre as diferent
 
 ---
 
-# 10. Estratégia de Modelagem de Dados
+# 9. Estratégia de Modelagem de Dados
 
 O banco de dados foi estruturado utilizando o modelo relacional.
 
@@ -339,11 +319,9 @@ O usuário autenticado também é utilizado como referência para identificar o 
 
 A modelagem busca manter os dados organizados e evitar duplicação desnecessária de informações.
 
-O detalhamento das tabelas e respectivos campos deve ser apresentado no documento de **Dicionário de Dados** do projeto.
-
 ---
 
-# 11. Estratégia de Autenticação
+# 10. Estratégia de Autenticação
 
 A autenticação foi implementada utilizando Spring Security e JWT.
 
@@ -373,7 +351,7 @@ Além da autenticação, o sistema possui diferenciação de permissões para de
 
 ---
 
-# 12. Comunicação entre Frontend e Backend
+# 11. Comunicação entre Frontend e Backend
 
 A comunicação entre frontend e backend ocorre através de APIs HTTP.
 
@@ -407,7 +385,7 @@ Essa separação permite que o frontend seja desacoplado da implementação inte
 
 ---
 
-# 13. API REST
+# 12. API REST
 
 A aplicação disponibiliza endpoints específicos para cada domínio.
 
@@ -435,7 +413,7 @@ A organização dos endpoints procura manter uma separação clara entre autenti
 
 ---
 
-# 14. Regras de Negócio
+# 13. Regras de Negócio
 
 Entre as principais regras implementadas estão:
 
@@ -452,7 +430,7 @@ Essas regras foram implementadas na camada responsável pela lógica de negócio
 
 ---
 
-# 15. Validações e Tratamento de Erros
+# 14. Validações e Tratamento de Erros
 
 A aplicação possui validações relacionadas aos dados recebidos pelas APIs e às regras de acesso.
 
@@ -468,7 +446,7 @@ Também seria possível aumentar a cobertura de testes automatizados para garant
 
 ---
 
-# 16. Frontend
+# 15. Frontend
 
 O frontend foi desenvolvido utilizando React e organizado de forma componentizada.
 
@@ -491,7 +469,7 @@ O frontend também é responsável por consumir as APIs disponibilizadas pelos m
 
 ---
 
-# 17. Segurança
+# 16. Segurança
 
 A segurança foi considerada principalmente nos seguintes pontos:
 
@@ -519,7 +497,7 @@ A autenticação foi isolada no `auth-service`, reduzindo a concentração de re
 
 ---
 
-# 18. Decisões Arquiteturais
+# 17. Decisões Arquiteturais
 
 A principal decisão arquitetural foi separar a aplicação em serviços independentes.
 
@@ -532,11 +510,11 @@ A separação facilita a evolução independente dessas partes da aplicação.
 
 Em contrapartida, uma arquitetura baseada em microsserviços aumenta a complexidade operacional em comparação com uma aplicação monolítica, pois exige gerenciamento de múltiplos serviços, comunicação entre processos e configuração de infraestrutura.
 
-Para o contexto do projeto, a escolha também permitiu demonstrar conhecimentos relacionados a APIs, autenticação, persistência, containers e separação de responsabilidades.
+Para o contexto do projeto, a escolha também me permitiu demonstrar conhecimentos relacionados a APIs, autenticação, persistência, containers e separação de responsabilidades.
 
 ---
 
-# 19. Padrões e Princípios Utilizados
+# 18. Padrões e Princípios Utilizados
 
 A aplicação utiliza conceitos de separação de responsabilidades e organização em camadas.
 
@@ -553,35 +531,11 @@ O objetivo dessas decisões é reduzir o acoplamento entre componentes e facilit
 
 ---
 
-# 20. Atendimento aos Requisitos do Desafio
+# 19. Análise Crítica
 
-A implementação foi estruturada para atender aos principais requisitos funcionais apresentados no desafio.
+## 19.1 Limitações
 
-| Requisito                      | Implementação                   |
-| ------------------------------ | ------------------------------- |
-| Login                          | `auth-service`                  |
-| Cadastro de usuário            | `auth-service`                  |
-| Controle de autenticação       | Spring Security + JWT           |
-| Cadastro de solicitações       | `solicitacao-service`           |
-| Edição de solicitação aberta   | `solicitacao-service`           |
-| Exclusão de solicitação aberta | `solicitacao-service`           |
-| Consulta de solicitações       | `solicitacao-service`           |
-| Alteração de status            | `solicitacao-service`           |
-| Filtros                        | `solicitacao-service`           |
-| Dashboard                      | Frontend + endpoint de métricas |
-| Persistência                   | PostgreSQL                      |
-| API                            | Spring Boot                     |
-| Containerização                | Docker + Docker Compose         |
-
-Os requisitos funcionais definidos pela avaliação incluem autenticação, cadastro, gerenciamento, filtros e dashboard.
-
----
-
-# 21. Análise Crítica
-
-## 21.1 Limitações
-
-Apesar de atender ao escopo proposto, a solução possui pontos que poderiam ser aprimorados em uma aplicação destinada a um ambiente de produção.
+A solução possui pontos que poderiam ser aprimorados.
 
 Entre eles:
 
@@ -594,9 +548,13 @@ Essas limitações estão relacionadas principalmente ao tempo e ao escopo defin
 
 ---
 
-# 22. Melhorias Futuras
+# 20. Melhorias Futuras
 
 Entre as possíveis evoluções estão:
+
+### Integração com Inteligência Artificial (LLMs)
+
+Implementar um chatbot inteligente para o atendimento inicial aos usuários. A IA interpretaria a solicitação em linguagem natural, extrairia os dados necessários e faria o roteamento automático do pedido diretamente para o departamento responsável (como RH ou Financeiro).
 
 ### Testes automatizados
 
@@ -604,7 +562,7 @@ Adicionar testes unitários e de integração para as principais regras de negó
 
 ### Observabilidade
 
-Adicionar ferramentas para monitoramento dos serviços, métricas, logs centralizados e rastreamento de requisições.
+Adicionar ferramentas para monitoramento dos serviços e rastreamento de requisições.
 
 ### Documentação da API
 
@@ -614,6 +572,3 @@ Adicionar documentação utilizando uma ferramenta como OpenAPI/Swagger.
 
 Em um cenário de maior utilização, os serviços poderiam ser escalados de maneira independente conforme a demanda.
 
-### Gerenciamento de configurações
-
-Em produção, as credenciais e demais informações sensíveis poderiam ser gerenciadas através de soluções específicas de gerenciamento de segredos.
