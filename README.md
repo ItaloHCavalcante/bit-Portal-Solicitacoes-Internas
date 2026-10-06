@@ -264,12 +264,20 @@ Depois, abra o arquivo `.env` e configure as variáveis necessárias para execu�
 Exemplo:
 
 ```bash
+backend:
+
 DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
 DB_PORT=5432
 
 PORT_AUTH=8085
 PORT_SOLICITACAO=8082
+
+Frontend
+
+VITE_AUTH_API_URL=http://IP.E.PORTA.DO.SERVIDOR:8085
+VITE_SOLICITACAO_API_URL=http://IP.E.PORTA.DO.SERVIDOR:8082
+
 ```
 
 > Os valores acima são apenas exemplos. Utilize os valores definidos no `.env.example` do projeto.
