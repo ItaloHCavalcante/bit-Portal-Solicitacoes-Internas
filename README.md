@@ -601,8 +601,4 @@ docker compose ps
 docker compose logs -f
 ```
 
----
-
-# 14. Licença
-
-Projeto desenvolvido como parte do processo seletivo para **Desenvolvedor(a) de Sistemas Júnior — bit Soluções**.
+--
