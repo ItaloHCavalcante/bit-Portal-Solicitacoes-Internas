@@ -3,7 +3,6 @@
 ## Portal de Solicitações Internas
 
 **Projeto:** Portal de Solicitações Internas
-**Processo:** Seleção para Desenvolvedor(a) de Sistemas Júnior — bit Soluções
 **Repositório:** GitHub
 **Arquitetura:** Full Stack baseada em microsserviços
 
