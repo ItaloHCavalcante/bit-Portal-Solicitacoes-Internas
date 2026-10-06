@@ -55,7 +55,7 @@ bit-Portal-Solicitacoes-Internas/
 │
 ├── docs/
 │   ├── memorial-tecnico.md
-│   └── dicionario-de-dados.md
+│  
 │
 ├── init.sql
 ├── docker-compose.yml
